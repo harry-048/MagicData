@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">MagicWall Data</string>
+    <string name="entername">Please enter name.</string>
+    <string name="enterpassword">Please enter password.</string>
+    <string name="loginname">Name</string>
+    <string name="loginpassword">Password</string>
+    <string name="loginbuttontext">Login</string>
+    <string name="username">Name</string>
+    <string name="phone_no">Phone No</string>
+    <string name="email_id">Email Id</string>
+    <string name="savebuttontext">Save</string>
+    <string name="invalidemail">Invalid email address</string>
+    <string name="enterusername">Please Enter UserName.</string>
+    <string name="enterphoneno">Please Enter PhoneNo.</string>
+    <string name="enteremail">Please Enter Email Id.</string>
+    <string name="incorrectnmandpass">Name or Password is incorrect.</string>
+    <string name="success">Successfully saved.</string>
+    <string name="logout">Logout</string>
+    <string name="logoutquestion">Sure want to logout?</string>
+    <string name="checkinternet">Please check your internet connection.</string>
+    <string name="checknumber">Please check phone number.</string>
+    <string name="firebaseusername">username</string>
+    <string name="firebasepassword">password</string>
+</resources>

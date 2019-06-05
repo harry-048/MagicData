@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "857232434190",
+    "firebase_url": "https://magicdata-d1a6d.firebaseio.com",
+    "project_id": "magicdata-d1a6d",
+    "storage_bucket": "magicdata-d1a6d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:857232434190:android:3d4e925832292268",
+        "android_client_info": {
+          "package_name": "com.rstream.magicdata"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "857232434190-qml1fte05885q220v4tfqtnht4id1lav.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-StSoc3Ce9Cb2ecy87VTgOloaC4bvO1E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "857232434190-qml1fte05885q220v4tfqtnht4id1lav.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
