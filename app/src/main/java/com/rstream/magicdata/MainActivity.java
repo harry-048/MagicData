@@ -9,15 +9,20 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -34,6 +39,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,19 +68,68 @@ public class MainActivity extends AppCompatActivity {
     Menu mainMenu=null;
     Boolean success=false;
     MenuItem logoutItem;
+    StringBuilder sb;
+    MenuItem syncData;
+    List<String> urlDataSet=null;
+    Set<String> urlSet;
+    Set<String> urlCollection;
+    Set<String> updateUrls;
+    Set<String> tempUrls;
+    ImageView syncButton;
+    Animation rotation;
+    Snackbar snackbar;
+    String allUrls;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     String id = "https://script.google.com/macros/s/AKfycbzxK7k-V7Jnbc2qkdwDd4KY_VKkIDuYoic3pThtZzL5huxcOIb-/exec";
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         MenuInflater inflater = getMenuInflater();
         menu.clear();
         if (login)
             inflater.inflate(R.menu.main_menu,menu);
 
         logoutItem = menu.findItem(R.id.logout);
+        syncData = menu.findItem(R.id.syncData);
+
+        LayoutInflater layoutInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        syncButton = (ImageView)layoutInflater.inflate(R.layout.iv_refresh, null);
+       // final ImageView syncButton = (ImageView) menu.findItem(R.id.syncData).getActionView();
+         rotation = AnimationUtils.loadAnimation(this, R.anim.anim);
+        rotation.setRepeatCount(Animation.INFINITE);
+
+        /*if (syncButton != null) {
+            syncButton.setImageResource(R.drawable.ic_sync_white_24dp);
+            // need some resize
+           // syncButton.setScaleX(IMAGE_SCALE);
+           // syncButton.setScaleY(IMAGE_SCALE);
+            syncButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d("rotationisdone","start");
+                    syncButton.startAnimation(rotation);
+                    menu.findItem(R.id.syncData).setActionView(syncButton);
+                    Log.d("rotationisdone","working");
+                  //  syncButton.startAnimation(rotation);
+                    // create and use new data set
+
+                }
+            });
+        }*/
+
+       /* Set<String> tempSet = sharedPreferences.getStringSet("urlUpdateValues",null);
+        if (tempSet!=null)
+            if (tempSet.size()>0){
+                syncData.setVisible(true);
+                syncData.setEnabled(true);
+            }
+            else{
+                syncData.setEnabled(false);
+                syncData.setVisible(false);
+            }*/
+
         mainMenu = menu;
 
         return true;
@@ -114,15 +172,92 @@ public class MainActivity extends AppCompatActivity {
             alertDialog.show();
         }
 
+        if (item.getItemId()==R.id.syncData){
+
+
+
+            syncData.setActionView(syncButton);
+           // syncButton.setVisibility(View.VISIBLE);
+           // syncData.setIcon(getDrawable(R.drawable.loadinganimation));
+
+
+
+           // menu.findItem(R.id.syncData).setActionView(syncButton);
+
+            if (checkInternet()){
+                Log.d("syncbutton","internet available");
+                urlSet =  sharedPreferences.getStringSet("urlvalues",null);
+
+
+               // updateUrls = new HashSet<String>();
+                tempUrls = new HashSet<String>();
+                tempUrls = sharedPreferences.getStringSet("urlUpdateValues",null);
+                //tempUrls = sharedPreferences.getStringSet("urlvalues",null);
+
+
+                if ((urlSet!=null&& !urlSet.isEmpty())||(tempUrls!=null&& !tempUrls.isEmpty())){
+                    Log.d("syncbutton","not null: "+urlSet);
+                    if (urlSet!=null&& !urlSet.isEmpty()){
+                        urlDataSet = new ArrayList<String>(urlSet);
+                        urlCollection = urlSet;
+                        sharedPreferences.edit().putStringSet("urlUpdateValues",urlSet).apply();
+                        urlSet.clear();
+                        urlSet = null;
+                        sharedPreferences.edit().putStringSet("urlvalues",urlSet).apply();
+                    }
+                    else if (tempUrls!=null&& !tempUrls.isEmpty()){
+                        urlDataSet = new ArrayList<String>(tempUrls);
+                        urlCollection = tempUrls;
+                        sharedPreferences.edit().putStringSet("urlUpdateValues",tempUrls).apply();
+                    }
+
+
+
+                    snackbar = Snackbar.make(findViewById(android.R.id.content), "Syncing...", Snackbar.LENGTH_INDEFINITE);
+                    snackbar.show();
+                    syncButton.startAnimation(rotation);
+                    syncData.setEnabled(false);
+                    syncButton.setEnabled(false);
+                    new UpdateData().execute(urlCollection);
+                }
+                else {
+                    Log.d("syncbutton","everytihng synced");
+                    Toast.makeText(this, "Everything is synced.", Toast.LENGTH_SHORT).show();
+                    syncData.setActionView(null);
+                }
+
+            }
+            else{
+                syncData.setActionView(null);
+                Toast.makeText(this, getString(R.string.checkinternet), Toast.LENGTH_SHORT).show();
+            }
+
+
+
+
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
+    public void saveUrl(String sUrl){
+        allUrls = sharedPreferences.getString("allurls",null);
+        Log.d("allurls",allUrls);
+        if (allUrls!=null && !allUrls.trim().equals("")){
+            allUrls = allUrls + ","+sUrl;
+        }
+        else {
+            allUrls = sUrl;
+        }
+    }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         nameEditText = findViewById(R.id.nameEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
@@ -137,6 +272,8 @@ public class MainActivity extends AppCompatActivity {
         loginProgress = findViewById(R.id.progressBar2);
         sharedPreferences = getSharedPreferences("prefs.xml",MODE_PRIVATE);
         login=sharedPreferences.getBoolean("login",false);
+        sb=new StringBuilder();
+        Log.d("urlsetvaluesare","first "+sharedPreferences.getStringSet("urlvalues",null)+"");
 
 
         if (login){
@@ -204,7 +341,40 @@ public class MainActivity extends AppCompatActivity {
         phoneNo = phoneEditText.getText().toString().trim();
         name = sharedPreferences.getString("username","");
         String urlValue= id+"?name="+userName+"&phone="+phoneNo+"&email="+mailId+"&username="+name;
-        if (checkInternet()){
+
+
+
+       urlSet =  sharedPreferences.getStringSet("urlvalues",null);
+       Log.d("urlsetvaluesare","before "+urlSet+"");
+       if (urlSet!=null&& !urlSet.isEmpty())
+        urlSet.add(urlValue);
+       else {
+           urlSet = new HashSet<String>();
+           urlSet.add(urlValue);
+       }
+
+       Toast.makeText(this, getString(R.string.success), Toast.LENGTH_SHORT).show();
+
+
+       /*if (urlDataSet!=null)
+       if (urlDataSet.size()>0)
+           syncData.setEnabled(true);
+       else
+           syncData.setEnabled(false);*/
+       Log.d("urlsetvaluesare","after "+urlSet+"");
+        sharedPreferences.edit().putStringSet("urlvalues",urlSet).apply();
+
+       Log.d("urlsetvaluesare","after save "+sharedPreferences.getStringSet("urlvalues",null)+"");
+
+       urlCollection = new HashSet<>();
+       urlCollection=urlSet;
+
+       usernameEditText.setText("");
+       phoneEditText.setText("");
+       emailEditText.setText("");
+       usernameEditText.requestFocus();
+
+        /*if (checkInternet()){
             progressBar.setVisibility(View.VISIBLE);
             sendButton.setText("");
             sendButton.setEnabled(false);
@@ -212,8 +382,83 @@ public class MainActivity extends AppCompatActivity {
         }
         else
             Toast.makeText(this, getString(R.string.checkinternet), Toast.LENGTH_SHORT).show();
-           Log.d("httpsurlconnection",urlValue);
+           Log.d("httpsurlconnection",urlValue);*/
    }
+
+   public class UpdateData extends AsyncTask<Set<String>,Void,String>{
+       String server_response;
+       @Override
+       protected String doInBackground(Set<String>... sets) {
+           URL url;
+           HttpURLConnection urlConnection = null;
+
+           try {
+               for (int i=0;i<urlDataSet.size();){
+                   url = new URL(urlDataSet.get(i));
+                   urlConnection = (HttpURLConnection) url.openConnection();
+
+                   int responseCode = urlConnection.getResponseCode();
+
+                   if(responseCode == HttpURLConnection.HTTP_OK){
+                       success =true;
+                       Log.d("httpsurlconnectionab","success: "+ urlDataSet.get(i));
+                       Log.d("httpsurlconnectionab",""+(urlDataSet.size()-1)+" "+getResources().getString(R.string.items_to_be_synced));
+                       urlDataSet.remove(i);
+                       Set<String> updateVal = new HashSet<>(urlDataSet);
+                       sharedPreferences.edit().putStringSet("urlUpdateValues",updateVal).apply();
+
+                       //server_response = readStream(urlConnection.getInputStream());
+
+                   }
+               }
+
+               if (urlDataSet.size()==0)
+                   success=true;
+             //  url = new URL(strings[0]);
+
+           } catch (IOException e) {
+               success=false;
+               Log.d("httpsurlconnectiona",e.getMessage());
+               e.printStackTrace();
+           }
+
+           return null;
+       }
+
+       @Override
+       protected void onPostExecute(String s) {
+           if (success)
+           {
+               Toast.makeText(MainActivity.this, getString(R.string.succesfullusynced), Toast.LENGTH_SHORT).show();
+           }
+           else {
+               Toast.makeText(MainActivity.this, getString(R.string.checkinternet), Toast.LENGTH_SHORT).show();
+
+               updateUrls = new HashSet<String>();
+               tempUrls = new HashSet<String>();
+               updateUrls = sharedPreferences.getStringSet("urlUpdateValues",null);
+               tempUrls = sharedPreferences.getStringSet("urlvalues",null);
+
+               if (tempUrls!=null && !tempUrls.isEmpty()){
+                   updateUrls.addAll(tempUrls);
+               }
+
+               if (updateUrls!=null && !updateUrls.isEmpty())
+                   sharedPreferences.edit().putStringSet("urlvalues",updateUrls).apply();
+
+
+
+           }
+           syncData.setEnabled(true);
+           syncButton.setEnabled(true);
+           snackbar.dismiss();
+           syncButton.clearAnimation();
+           syncData.setActionView(null);
+
+           super.onPostExecute(s);
+       }
+   }
+
 
     public class SendData extends AsyncTask<String , Void ,String> {
         String server_response;

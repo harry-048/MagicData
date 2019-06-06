@@ -21,4 +21,7 @@
     <string name="checknumber">Please check phone number.</string>
     <string name="firebaseusername">username</string>
     <string name="firebasepassword">password</string>
+    <string name="items_to_be_synced">items to be synced</string>
+    <string name="sync">sync</string>
+    <string name="succesfullusynced">Successfully synced.</string>
 </resources>

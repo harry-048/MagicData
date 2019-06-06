@@ -4,11 +4,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     tools:context=".MainActivity">
 
+    <!--<LinearLayout
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/syncData"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+
+            android:id="@+id/syncTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/items_to_be_synced"/>
+
+        <ImageView
+            android:id="@+id/syncImageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/ic_sync_black_24dp"/>
+
+    </LinearLayout>
+-->
 <LinearLayout
     android:id="@+id/loginLayout"
+    android:layout_centerInParent="true"
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
@@ -74,6 +100,7 @@
 </LinearLayout>
 
     <LinearLayout
+        android:layout_centerInParent="true"
         android:id="@+id/dataLayout"
         android:orientation="vertical"
         android:visibility="invisible"

@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#2196f3</color>
-    <color name="colorPrimaryDark">#1287E6</color>
+
+    <color name="colorPrimary">#fb3378</color>
+    <color name="colorPrimaryDark">#c2004d</color>
+    <color name="buttoncolor">#fb3378</color>
+    <color name="strokecolor">#c2004d</color>
+
+    <!--<color name="colorPrimary">#2196f3</color>
+    <color name="colorPrimaryDark">#1287E6</color>-->
     <color name="colorAccent">#D81B60</color>
     <color name="buttontextcolor">#ffffff</color>
     <color name="Progressbarcolor">#ffffff</color>
-    <color name="buttoncolor">#2196f3</color>
-    <color name="strokecolor">#2f6699</color>
+    <!--<color name="buttoncolor">#2196f3</color>
+    <color name="strokecolor">#2f6699</color>-->
 </resources>
